@@ -7,5 +7,5 @@ impl K6client {
         K6client {}
     }
 
-    pub fn run(&self, command: &Command) {}
+    pub async fn run(&self, command: &Command) {}
 }
