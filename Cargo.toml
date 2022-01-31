@@ -1,0 +1,13 @@
+[package]
+name = "k6-reports"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+influxdb = { version = "0.5.1", features = ["derive"] }
+structopt = "0.3.26"
+structopt-derive = "0.4.18"
+thiserror = "1.0.30"
+tokio = { version = "1.7", features = ["macros", "rt-multi-thread"] }
