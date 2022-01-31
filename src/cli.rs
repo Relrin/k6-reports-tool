@@ -1,4 +1,5 @@
-﻿use structopt::StructOpt;
+﻿use chrono::{DateTime, FixedOffset};
+use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "k6-reports")]
@@ -46,11 +47,12 @@ pub enum Command {
         )]
         password: String,
 
-        //#[structopt(
-        //    long = "--from",
-        //    help = "How long to look into history by time"
-        //)]
-        //from: Option<String1>
+        #[structopt(
+            long = "--from",
+            help = "How long to look into history by time. The format of the timestamp defined by RFC 3339 as h, m, s, ms, u or ns."
+        )]
+        from: Option<DateTime<FixedOffset>>,
+
         #[structopt(long = "--exclude-setup", help = "Exclude setup steps from reports")]
         exclude_setup_steps: bool,
 
