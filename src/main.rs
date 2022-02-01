@@ -1,14 +1,16 @@
+mod app;
 mod cli;
-mod client;
+mod report;
 
 use structopt::StructOpt;
 
+use crate::app::App;
 use crate::cli::Command;
-use crate::client::K6client;
+use crate::report::K6Report;
 
 #[tokio::main]
 async fn main() {
     let command = Command::from_args();
-    let client = K6client::new();
-    client.run(&command).await;
+    let app = App::new();
+    app.run(&command).await;
 }

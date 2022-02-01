@@ -34,18 +34,23 @@ pub enum Command {
         #[structopt(
             short = "u",
             long = "username",
-            default_value = "admin",
-            help = "Username for a connection"
+            help = "Username for a connection",
+            env = "K6_REPORTS_DB_USERNAME",
+            hide_env_values = true
         )]
-        username: String,
+        username: Option<String>,
 
         #[structopt(
             short = "s",
             long = "password",
-            default_value = "admin",
-            help = "Used password along with the username"
+            help = "Used password along with the username",
+            env = "K6_REPORTS_DB_PASSWORD",
+            hide_env_values = true
         )]
-        password: String,
+        password: Option<String>,
+
+        #[structopt(long = "--https", help = "Connecting to the database with HTTPS")]
+        https: bool,
 
         #[structopt(
             long = "--from",
