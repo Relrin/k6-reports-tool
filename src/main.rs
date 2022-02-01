@@ -1,5 +1,6 @@
 mod app;
 mod cli;
+mod error;
 mod metrics;
 mod report;
 
@@ -7,7 +8,6 @@ use structopt::StructOpt;
 
 use crate::app::App;
 use crate::cli::Command;
-use crate::report::K6Report;
 
 #[tokio::main]
 async fn main() {

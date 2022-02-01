@@ -1,5 +1,4 @@
-﻿use chrono::{DateTime, FixedOffset};
-use structopt::StructOpt;
+﻿use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "k6-reports")]
@@ -54,9 +53,9 @@ pub enum Command {
 
         #[structopt(
             long = "--from",
-            help = "How long to look into history by time. The format of the timestamp defined by RFC 3339 as h, m, s, ms, u or ns."
+            help = "How long to look into history by time (in minutes)"
         )]
-        from: Option<DateTime<FixedOffset>>,
+        from: Option<u64>,
 
         #[structopt(long = "--exclude-setup", help = "Exclude setup steps from reports")]
         exclude_setup_steps: bool,
@@ -66,5 +65,12 @@ pub enum Command {
             help = "Exclude teardown steps from reports"
         )]
         exclude_teardown_steps: bool,
+
+        #[structopt(
+            long = "--output",
+            help = "Output directory for extracted data",
+            default_value = "./reports"
+        )]
+        output_directory: String,
     },
 }

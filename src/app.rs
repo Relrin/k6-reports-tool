@@ -20,6 +20,7 @@ impl App {
                 from,
                 exclude_setup_steps,
                 exclude_teardown_steps,
+                output_directory,
             } => {
                 let k6_report = K6Report::new(
                     host,
@@ -31,6 +32,7 @@ impl App {
                     from,
                     exclude_setup_steps,
                     exclude_teardown_steps,
+                    output_directory,
                 );
                 k6_report.extract_metrics().await;
             }

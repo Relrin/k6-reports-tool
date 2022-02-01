@@ -1,10 +1,8 @@
 ﻿use chrono::{DateTime, Utc};
+use serde::Deserialize;
 
-pub trait K6Metric {
-    fn get_metric_name() -> &'static str;
-}
-
-pub struct HttpReqDuration {
+#[derive(Deserialize, Debug, Clone)]
+pub struct HttpReqDurationMetric {
     time: DateTime<Utc>,
     error: String,
     error_code: u16,
@@ -18,10 +16,4 @@ pub struct HttpReqDuration {
     tls_version: String,
     url: String,
     value: f64, // duration
-}
-
-impl K6Metric for HttpReqDuration {
-    fn get_metric_name() -> &'static str {
-        return "http_req_duration";
-    }
 }
