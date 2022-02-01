@@ -1,5 +1,6 @@
 mod app;
 mod cli;
+mod metrics;
 mod report;
 
 use structopt::StructOpt;
