@@ -24,7 +24,7 @@ For using this CLI tool will need:
 
       Move the binary file to the `/usr/local/bin` directory and restart the terminal
         ```
-        mv ~/Downloads/k6-reports-tool /usr/local/bin
+        mv ~/Downloads/k6-reports /usr/local/bin
         ```
 
     - Windows
