@@ -65,7 +65,7 @@ For running k6 tests and pushing metrics to a InfluxDB node you can use the k6 C
 k6 run --out influxdb=http://influxdb:8086/k6 ./simple-k6-test.js
 ```
 
-For more information about how to implement and run k6 tests you also check the official [k6 documentation](https://k6.io/docs/getting-started/running-k6/).
+For more information about how to implement and run k6 tests you can read the official [k6 documentation](https://k6.io/docs/getting-started/running-k6/).
 
 ## License
 
