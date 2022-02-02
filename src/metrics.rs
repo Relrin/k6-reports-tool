@@ -32,9 +32,9 @@ pub trait K6Metric {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ChecksMetric {
     time: DateTime<Utc>,
-    check: String,
+    check: Option<String>,
     group: Option<String>,
-    method: String,
+    method: Option<String>,
     scenario: Option<String>,
     value: f64, // The rate of successful checks
 }
@@ -98,13 +98,13 @@ pub struct HttpReqConnectingMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // Time spent establishing TCP connection to the remote host
 }
@@ -137,13 +137,13 @@ pub struct HttpReqBlockedMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // Time spent blocked (waiting for a free TCP connection slot) before initiating the request
 }
@@ -176,13 +176,13 @@ pub struct HttpReqDurationMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // duration
 }
@@ -215,13 +215,13 @@ pub struct HttpReqFailedMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // The rate of failed requests according to setResponseCallback
 }
@@ -254,13 +254,13 @@ pub struct HttpReqReceivingMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // Time spent receiving response data from the remote host
 }
@@ -293,13 +293,13 @@ pub struct HttpReqSendingMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // Time spent sending data to the remote host
 }
@@ -332,13 +332,13 @@ pub struct HttpReqTlsHandshakingMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // Time spent handshaking TLS session with remote host
 }
@@ -371,13 +371,13 @@ pub struct HttpReqWaitingMetric {
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
     group: Option<String>,
-    method: String,
-    name: String,
-    proto: String,
+    method: Option<String>,
+    name: Option<String>,
+    proto: Option<String>,
     scenario: Option<String>,
     #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
-    tls_version: String,
+    tls_version: Option<String>,
     url: String,
     value: f64, // Time spent waiting for response from remote host
 }
