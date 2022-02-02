@@ -4,10 +4,17 @@ use std::path::Path;
 use chrono::{DateTime, Duration, SecondsFormat, Utc};
 use csv_async::AsyncSerializer;
 use influxdb::{Client, ReadQuery};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tokio::fs::{create_dir_all, File};
 
 use crate::error::Result;
-use crate::metrics::{HttpReqDurationMetric, K6Metric};
+use crate::metrics::{
+    ChecksMetric, DataReceivedMetric, DataSentMetric, HttpReqBlockedMetric,
+    HttpReqConnectingMetric, HttpReqDurationMetric, HttpReqFailedMetric, HttpReqReceivingMetric,
+    HttpReqSendingMetric, HttpReqTlsHandshakingMetric, HttpReqWaitingMetric, IterationMetric,
+    IterationsDurationMetric, K6Metric, VusMaxMetric, VusMetric,
+};
 
 pub struct K6Report {
     invoked_at: DateTime<Utc>,
@@ -59,22 +66,41 @@ impl K6Report {
 
     pub async fn extract_metrics(&self) -> Result<()> {
         create_dir_all(&self.output_directory).await?;
-        let exported_metrics = [self.export_metric::<HttpReqDurationMetric>()];
 
-        for metric_to_export in exported_metrics {
-            metric_to_export.await?
-        }
+        self.export_metric::<ChecksMetric>(true).await?;
+
+        self.export_metric::<DataReceivedMetric>(true).await?;
+        self.export_metric::<DataSentMetric>(true).await?;
+
+        self.export_metric::<HttpReqBlockedMetric>(true).await?;
+        self.export_metric::<HttpReqConnectingMetric>(true).await?;
+        self.export_metric::<HttpReqDurationMetric>(true).await?;
+        self.export_metric::<HttpReqFailedMetric>(true).await?;
+        self.export_metric::<HttpReqReceivingMetric>(true).await?;
+        self.export_metric::<HttpReqSendingMetric>(true).await?;
+        self.export_metric::<HttpReqTlsHandshakingMetric>(true)
+            .await?;
+        self.export_metric::<HttpReqWaitingMetric>(true).await?;
+
+        self.export_metric::<IterationMetric>(false).await?;
+        self.export_metric::<IterationsDurationMetric>(true).await?;
+
+        self.export_metric::<VusMetric>(false).await?;
+        self.export_metric::<VusMaxMetric>(false).await?;
 
         Ok(())
     }
 
-    pub async fn export_metric<T: K6Metric>(&self) -> Result<()> {
+    pub async fn export_metric<T: 'static>(&self, apply_exclude: bool) -> Result<()>
+    where
+        T: K6Metric + Serialize + DeserializeOwned + Send,
+    {
         let table_name = T::metric_table_name();
         println!("Exporting data for the `{0}` metrics", table_name);
 
-        let query = self.build_query::<T>()?;
+        let query = self.build_query::<T>(apply_exclude)?;
         let mut response = self.db_client.json_query(query).await?;
-        let data = response.deserialize_next::<HttpReqDurationMetric>()?;
+        let data = response.deserialize_next::<T>()?;
 
         let filename = format!("{0}.csv", table_name);
         let filepath = Path::new(&self.output_directory).join(&filename);
@@ -87,11 +113,10 @@ impl K6Report {
             }
         }
 
-        println!("Export for the `{0}` metrics has completed", table_name);
         Ok(())
     }
 
-    fn build_query<T: K6Metric>(&self) -> Result<ReadQuery> {
+    fn build_query<T: K6Metric>(&self, apply_exclude: bool) -> Result<ReadQuery> {
         let mut raw_query = String::from("SELECT ");
         let selected_fields = T::query_fields().join(", ");
         write!(&mut raw_query, "{}", selected_fields)?;
@@ -116,12 +141,14 @@ impl K6Report {
             filters.push(filter_clause);
         }
 
-        if self.exclude_setup_steps {
-            filters.push(r#""group"!='::setup'"#.to_string());
-        }
+        if apply_exclude {
+            if self.exclude_setup_steps {
+                filters.push(r#""group"!='::setup'"#.to_string());
+            }
 
-        if self.exclude_teardown_steps {
-            filters.push(r#""group"!='::teardown'"#.to_string());
+            if self.exclude_teardown_steps {
+                filters.push(r#""group"!='::teardown'"#.to_string());
+            }
         }
 
         if !filters.is_empty() {

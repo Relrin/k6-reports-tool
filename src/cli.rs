@@ -4,8 +4,8 @@
 #[structopt(name = "k6-reports")]
 pub enum Command {
     /// Extracts test results in the CSV format from InfluxDB
-    #[structopt(name = "extract")]
-    Extract {
+    #[structopt(name = "export")]
+    Export {
         #[structopt(
             short = "h",
             long = "host",

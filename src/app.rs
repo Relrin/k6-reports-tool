@@ -10,7 +10,7 @@ impl App {
 
     pub async fn run(&self, command: &Command) {
         match command {
-            Command::Extract {
+            Command::Export {
                 host,
                 port,
                 database,
