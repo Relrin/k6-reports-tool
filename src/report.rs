@@ -7,7 +7,7 @@ use influxdb::{Client, ReadQuery};
 use tokio::fs::{create_dir_all, File};
 
 use crate::error::Result;
-use crate::metrics::HttpReqDurationMetric;
+use crate::metrics::{HttpReqDurationMetric, K6Metric};
 
 pub struct K6Report {
     invoked_at: DateTime<Utc>,
@@ -59,19 +59,20 @@ impl K6Report {
 
     pub async fn extract_metrics(&self) -> Result<()> {
         create_dir_all(&self.output_directory).await?;
-        let export_requests = ["http_req_duration"];
+        let exported_metrics = [self.export_metric::<HttpReqDurationMetric>()];
 
-        for table_name in export_requests {
-            self.export_metric(table_name).await?
+        for metric_to_export in exported_metrics {
+            metric_to_export.await?
         }
 
         Ok(())
     }
 
-    pub async fn export_metric(&self, table_name: &str) -> Result<()> {
+    pub async fn export_metric<T: K6Metric>(&self) -> Result<()> {
+        let table_name = T::metric_table_name();
         println!("Exporting data for the `{0}` metrics", table_name);
 
-        let query = self.build_query(table_name)?;
+        let query = self.build_query::<T>()?;
         let mut response = self.db_client.json_query(query).await?;
         let data = response.deserialize_next::<HttpReqDurationMetric>()?;
 
@@ -90,29 +91,16 @@ impl K6Report {
         Ok(())
     }
 
-    fn build_query(&self, metric_name: &str) -> Result<ReadQuery> {
+    fn build_query<T: K6Metric>(&self) -> Result<ReadQuery> {
         let mut raw_query = String::from("SELECT ");
-        let selected_fields = [
-            "time",
-            r#""expected_response""#,
-            r#""group""#,
-            r#""method""#,
-            r#""name""#,
-            r#""proto""#,
-            r#""scenario""#,
-            r#""status""#,
-            r#""tls_version""#,
-            r#""url""#,
-            "value",
-        ]
-        .join(", ");
+        let selected_fields = T::query_fields().join(", ");
         write!(&mut raw_query, "{}", selected_fields)?;
 
         let from_statement = format!(
             " FROM {0}.{1}.{2}",
             self.db_client.database_name(),
             self.retention_policy_name,
-            metric_name
+            T::metric_table_name()
         );
         write!(&mut raw_query, "{}", from_statement)?;
 

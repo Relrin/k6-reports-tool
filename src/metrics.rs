@@ -26,8 +26,7 @@ where
 
 pub trait K6Metric {
     fn metric_table_name() -> &'static str;
-    //fn fields() -> &'static [&'static str];
-    //fn csv_headers() -> &'static [&'static str];
+    fn query_fields() -> &'static [&'static str];
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -49,6 +48,22 @@ pub struct HttpReqDurationMetric {
 
 impl K6Metric for HttpReqDurationMetric {
     fn metric_table_name() -> &'static str {
-        ""
+        "http_req_duration"
+    }
+
+    fn query_fields() -> &'static [&'static str] {
+        &[
+            "time",
+            r#""expected_response""#,
+            r#""group""#,
+            r#""method""#,
+            r#""name""#,
+            r#""proto""#,
+            r#""scenario""#,
+            r#""status""#,
+            r#""tls_version""#,
+            r#""url""#,
+            "value",
+        ]
     }
 }
