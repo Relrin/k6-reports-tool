@@ -1,17 +1,46 @@
 ﻿use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
+use std::str::FromStr;
+
+fn custom_deserialize_bool_from_str<'de, D>(deserializer: D) -> Result<bool, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    match bool::from_str(&s) {
+        Ok(value) => Ok(value),
+        _ => Ok(false),
+    }
+}
+
+fn custom_deserialize_u16_from_str<'de, D>(deserializer: D) -> Result<u16, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    match u16::from_str(&s) {
+        Ok(value) => Ok(value),
+        _ => Ok(0),
+    }
+}
+
+pub trait K6Metric {
+    fn metric_table_name() -> &'static str;
+    fn fields() -> [&str];
+    fn csv_fields() -> [&str];
+}
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct HttpReqDurationMetric {
     time: DateTime<Utc>,
-    error: String,
-    error_code: u16,
+    #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
     expected_response: bool,
-    group: String,
+    group: Option<String>,
     method: String,
     name: String,
     proto: String,
-    scenario: String,
+    scenario: Option<String>,
+    #[serde(deserialize_with = "custom_deserialize_u16_from_str")]
     status: u16,
     tls_version: String,
     url: String,

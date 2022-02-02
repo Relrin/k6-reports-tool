@@ -77,12 +77,13 @@ impl K6Report {
         let mut db_result = self.db_client.json_query(query).await?;
 
         // TODO: Deserialize + write to a file
-        let _result = db_result
-            .deserialize_next::<HttpReqDurationMetric>()?
-            .series
-            .into_iter()
-            .map(|mut x| x)
-            .collect::<Vec<HttpReqDurationMetric>>();
+        let result = db_result.deserialize_next::<HttpReqDurationMetric>()?;
+        //.series
+        //.into_iter()
+        //.map(|mut x| x)
+        //.collect::<Vec<HttpReqDurationMetric>>();
+
+        println!("{:?}", result.series);
 
         Ok(())
     }
@@ -91,7 +92,6 @@ impl K6Report {
         let mut raw_query = String::from("SELECT ");
         let selected_fields = [
             "time",
-            r#""error_code""#,
             r#""expected_response""#,
             r#""group""#,
             r#""method""#,
