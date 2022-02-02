@@ -1,7 +1,10 @@
 ﻿use std::fmt::Write;
+use std::path::Path;
 
 use chrono::{DateTime, Duration, SecondsFormat, Utc};
+use csv_async::AsyncSerializer;
 use influxdb::{Client, ReadQuery};
+use tokio::fs::{create_dir_all, File};
 
 use crate::error::Result;
 use crate::metrics::HttpReqDurationMetric;
@@ -54,37 +57,36 @@ impl K6Report {
         }
     }
 
-    pub async fn extract_metrics(&self) {
+    pub async fn extract_metrics(&self) -> Result<()> {
+        create_dir_all(&self.output_directory).await?;
         let export_requests = ["http_req_duration"];
 
         for table_name in export_requests {
-            println!("Export for the `{0}` has completed", table_name);
-
-            match self.export_metric(table_name).await {
-                Ok(_) => println!("Export for the `{0}` has completed", table_name),
-                Err(error) => {
-                    println!(
-                        "Data for `{0}` can't be exported for. Details: {1}",
-                        table_name, error
-                    );
-                }
-            };
+            self.export_metric(table_name).await?
         }
+
+        Ok(())
     }
 
     pub async fn export_metric(&self, table_name: &str) -> Result<()> {
+        println!("Exporting data for the `{0}` metrics", table_name);
+
         let query = self.build_query(table_name)?;
-        let mut db_result = self.db_client.json_query(query).await?;
+        let mut response = self.db_client.json_query(query).await?;
+        let data = response.deserialize_next::<HttpReqDurationMetric>()?;
 
-        // TODO: Deserialize + write to a file
-        let result = db_result.deserialize_next::<HttpReqDurationMetric>()?;
-        //.series
-        //.into_iter()
-        //.map(|mut x| x)
-        //.collect::<Vec<HttpReqDurationMetric>>();
+        let filename = format!("{0}.csv", table_name);
+        let filepath = Path::new(&self.output_directory).join(&filename);
+        let output_file = File::create(filepath).await?;
+        let mut csv_writer = AsyncSerializer::from_writer(output_file);
 
-        println!("{:?}", result.series);
+        for series in data.series {
+            for record in series.values {
+                csv_writer.serialize(record).await?;
+            }
+        }
 
+        println!("Export for the `{0}` metrics has completed", table_name);
         Ok(())
     }
 

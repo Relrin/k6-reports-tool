@@ -1,5 +1,5 @@
 ﻿use chrono::{DateTime, Utc};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
 fn custom_deserialize_bool_from_str<'de, D>(deserializer: D) -> Result<bool, D::Error>
@@ -26,11 +26,11 @@ where
 
 pub trait K6Metric {
     fn metric_table_name() -> &'static str;
-    fn fields() -> [&str];
-    fn csv_fields() -> [&str];
+    //fn fields() -> &'static [&'static str];
+    //fn csv_headers() -> &'static [&'static str];
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HttpReqDurationMetric {
     time: DateTime<Utc>,
     #[serde(deserialize_with = "custom_deserialize_bool_from_str")]
@@ -45,4 +45,10 @@ pub struct HttpReqDurationMetric {
     tls_version: String,
     url: String,
     value: f64, // duration
+}
+
+impl K6Metric for HttpReqDurationMetric {
+    fn metric_table_name() -> &'static str {
+        ""
+    }
 }

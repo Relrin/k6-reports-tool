@@ -34,7 +34,10 @@ impl App {
                     exclude_teardown_steps,
                     output_directory,
                 );
-                k6_report.extract_metrics().await;
+                match k6_report.extract_metrics().await {
+                    Ok(_) => println!("Export finished successfully"),
+                    Err(error) => println!("Export can't be executed. Reason: {:?}", error),
+                }
             }
         }
     }
