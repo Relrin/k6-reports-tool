@@ -3,7 +3,7 @@ A CLI tool for managing k6 test results
 
 This CLI executable was implemented for covering developer needs in saving K6 load test results after the execution. The current implementation relies on the fact that  we store all generated data in the InfluxDB local or remote node. However, as developer as it would be great to export such information for tracking history between test runs and do analytics based on that.
 
-Currently K6 provides some exports in the [PDF format](https://k6.io/docs/cloud/analyzing-results/result-export/), however such functionality expect from a developer or a company to handle a quite [expensive subscription](https://k6.io/pricing/) what can be an issue for small teams.
+Currently K6 provides some exports in the [PDF format](https://k6.io/docs/cloud/analyzing-results/result-export/), however such functionality expects from a developer or a company to own a quite [expensive subscription](https://k6.io/pricing/) what can be an issue for small teams.
 
 - [Quick start](#quick-start)
 - [Development](#development)
@@ -47,7 +47,7 @@ For more information about the extracted metrics:
 
 To start developing will need to have installed latest [K6](https://k6.io/docs/getting-started/installation/), [Rust](https://www.rust-lang.org/learn/get-started) and [Docker](https://docs.docker.com/install/). 
 
-Instead of manually installing all of the used dependencies (e.g. Grafana nodes), will be more than enough to start up a bunch of Docker container with the following command:
+Instead of manually installing all of the used dependencies (e.g. Grafana nodes), will be more than enough to start up a bunch of Docker containers with the following command:
 ```
 docker-compose up -d
 ```
@@ -60,7 +60,7 @@ After it, we can interact with the such environment by exposed ports:
 | 8086       | InfluxDB    |
 | 8888       | Chronograf  |
 
-For running k6 tests and pushing metrics to a InfluxDB node you can use the k6 CLI with command like this one:
+For running k6 tests and pushing metrics to a InfluxDB node you can use the k6 CLI with a command like this one:
 ```bash
 k6 run --out influxdb=http://influxdb:8086/k6 ./simple-k6-test.js
 ```
